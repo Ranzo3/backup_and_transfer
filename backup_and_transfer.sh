@@ -162,7 +162,7 @@ then
         end loop;
         end;
         /
-        EOF
+	EOF
         logstamp "End RDS ${BDIR} file purge"
         logstamp "Beginning of ${RDIR} purge"
         find ${RDIR} -type f -mtime +${PURGE} -exec rm {} \;
