@@ -266,14 +266,12 @@ do
           v_file utl_file.file_type;
           v_buffer_size pls_integer := 32767;
           v_buffer varchar2(32767);
-          v_output varchar2(32767) := '';
         begin
             v_file := utl_file.fopen(p_directory, p_filename, 'r', v_buffer_size);
             loop
               begin
                 utl_file.get_line(v_file, v_buffer);
-                v_output := v_output || CHR(10) || v_buffer;
-                dbms_output.put_line(v_output);
+                dbms_output.put_line(v_buffer);
               exception when no_data_found then exit;
               end;
             end loop;
