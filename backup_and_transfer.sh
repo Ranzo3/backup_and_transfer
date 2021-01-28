@@ -59,8 +59,8 @@ show_usage() {
         echo "  -u <user> is the RDS instance user leveraged for all database operations"
         echo "  -w <password> is the password for the RDS user.  If not defined, you will be prompted"
         echo "  -t <parallel> is the number of parallel channels for backup. Default is 2"
-    echo "  -z <archive> is for if we want to include archive backup with incremental backup. Default is set to true
-    echo "  -h will display this message
+        echo "  -z <archive> is for if we want to include archive backup with incremental backup. Default is set to true
+        echo "  -h will display this message
         echo
         exit 1
 }
@@ -171,7 +171,7 @@ then
         end loop;
         end;
         /
-    EOF
+        EOF
         logstamp "End RDS ${BDIR} file purge"
         logstamp "Beginning of ${RDIR} purge"
         find ${RDIR} -type f -mtime +${PURGE} -exec rm {} \;
@@ -236,7 +236,7 @@ then
               p_s3_prefix => '',
               p_directory_name => '${BDIR}')
         as task_id from dual;
-    EOF`
+        EOF`
 else
         taskid=`sqlplus -s /nolog<<-EOF |tail -1
         connect ${USER}/${PASS}@"${SID}"
@@ -247,7 +247,7 @@ else
               p_s3_prefix => '${DNAME}/',
               p_directory_name => '${BDIR}')
         as task_id from dual;
-    EOF`
+        EOF`
 fi
 
 logstamp "Transfer upload started"
@@ -288,7 +288,7 @@ do
         end;
         /
         spool off;
-    EOF
+        EOF
         sleep ${lsleep}
         /bin/grep -q "The task finished successfully" ${TFILE}
         retval=$?
