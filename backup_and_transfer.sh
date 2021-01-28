@@ -36,13 +36,14 @@ BNAME=delphix-backup-bucket
 #DNAME=MYSOURCE  #Enables possible use case of same bucket for multiple databases
 SID=MYSOURCE
 COMPRESS=TRUE
+PARALLEL=2
+ARCHIVE=TRUE
 RDIR=/home/oracle/fusemount/mysource-backup-bucket
 SSEC=2
 SRCSCRIPT=~oracle/.profile.18
-
 show_usage() {
         echo
-        echo "${0} [ -b <s3 bucket> ] [ -c ] [ -d <db dir> ] [ -e <profile script> ] [ -l 0|1 ] [ -o <dir> ] [ -p <# of days> ] [ -r <s3fs dir> ] [ -s <RDS SID> ] [ -u <user> ] [ -w <password> ]";
+        echo "${0} [ -b <s3 bucket> ] [ -c ] [ -d <db dir> ] [ -e <profile script> ] [ -l 0|1 ] [ -o <dir> ] [ -p <# of days> ] [ -r <s3fs dir> ] [ -s <RDS SID> ] [ -u <user> ] [ -w <password> ] [-t <1|2|3>][-z <FALSE>]";
         echo
         echo "Where: "
         echo "  -b <s3 bucket> is the S3 bucket where you want to transfer the backup files when complete"
@@ -57,12 +58,14 @@ show_usage() {
         echo "  -s <sid> indicates the TNS entry or connection string for the RDS source instance"
         echo "  -u <user> is the RDS instance user leveraged for all database operations"
         echo "  -w <password> is the password for the RDS user.  If not defined, you will be prompted"
-        echo "  -h will display this message"
+        echo "  -t <parallel> is the number of parallel channels for backup. Default is 2"
+        echo "  -z <archive> is for if we want to include archive backup with incremental backup. Default is set to true
+        echo "  -h will display this message
         echo
         exit 1
 }
 
-while getopts b:cd:e:hl:o:p:r:s:u:w: opt
+while getopts b:cd:e:hl:o:p:r:s:u:w:t:z: opt
 do
         case ${opt} in
                 b)
@@ -97,6 +100,12 @@ do
                         ;;
                 w)
                         PASS=${OPTARG}
+                        ;;
+                t)
+                        PARALLEL=${OPTARG}
+                        ;;
+                z)
+                        ARCHIVE=${OPTARG}
                         ;;
                 h|*)
                         show_usage
@@ -176,7 +185,7 @@ connect $USER/${PASS}@"${SID}"
 set serveroutput on;
 set linesize 32767 trimspool on trimout on wrap off termout off;
 spool ${BFILE};
-exec RDSADMIN.RDSADMIN_RMAN_UTIL.BACKUP_DATABASE_INCREMENTAL(P_OWNER => 'SYS', P_DIRECTORY_NAME => '${BDIR}', P_COMPRESS => ${COMPRESS}, P_OPTIMIZE => TRUE, P_RMAN_TO_DBMS_OUTPUT => TRUE, P_LEVEL => ${LEV}, P_INCLUDE_ARCHIVE_LOGS => TRUE, P_INCLUDE_CONTROLFILE => TRUE);
+exec RDSADMIN.RDSADMIN_RMAN_UTIL.BACKUP_DATABASE_INCREMENTAL(P_OWNER => 'SYS', P_DIRECTORY_NAME => '${BDIR}', P_COMPRESS => ${COMPRESS}, P_OPTIMIZE => TRUE, P_RMAN_TO_DBMS_OUTPUT => TRUE, P_LEVEL => ${LEV}, P_INCLUDE_ARCHIVE_LOGS => ${ARCHIVE},P_PARALLEL =>${PARALLEL} , P_INCLUDE_CONTROLFILE => TRUE);
 spool off;
 EOF
 logstamp "Backup Finished"
