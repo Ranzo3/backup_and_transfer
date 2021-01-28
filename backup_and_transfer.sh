@@ -101,12 +101,12 @@ do
                 w)
                         PASS=${OPTARG}
                         ;;
-        t)
-            PARALLEL=${OPTARG}
-            ;;
-        z)
-            ARCHIVE=${OPTARG}
-            ;;
+                t)
+                        PARALLEL=${OPTARG}
+                        ;;
+                z)
+                        ARCHIVE=${OPTARG}
+                        ;;
                 h|*)
                         show_usage
                         ;;
@@ -185,8 +185,7 @@ connect $USER/${PASS}@"${SID}"
 set serveroutput on;
 set linesize 32767 trimspool on trimout on wrap off termout off;
 spool ${BFILE};
-exec RDSADMIN.RDSADMIN_RMAN_UTIL.BACKUP_DATABASE_INCREMENTAL(P_OWNER => 'SYS', P_DIRECTORY_NAME => '${BDIR}', P_COMPRESS => ${COMPRESS}, P_OPTIMIZE => TRUE, P_RMAN_TO_DBMS_OUTPUT => TRUE, P_LEVEL => ${LEV}, P_INCLUDE_ARCHIVE_LOGS => ${ARCHIVE},P_PARALL
-EL =>${PARALLEL} , P_INCLUDE_CONTROLFILE => TRUE);
+exec RDSADMIN.RDSADMIN_RMAN_UTIL.BACKUP_DATABASE_INCREMENTAL(P_OWNER => 'SYS', P_DIRECTORY_NAME => '${BDIR}', P_COMPRESS => ${COMPRESS}, P_OPTIMIZE => TRUE, P_RMAN_TO_DBMS_OUTPUT => TRUE, P_LEVEL => ${LEV}, P_INCLUDE_ARCHIVE_LOGS => ${ARCHIVE},P_PARALLEL =>${PARALLEL} , P_INCLUDE_CONTROLFILE => TRUE);
 spool off;
 EOF
 logstamp "Backup Finished"
